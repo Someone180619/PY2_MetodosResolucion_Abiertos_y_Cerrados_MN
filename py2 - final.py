@@ -1,17 +1,15 @@
 import numpy as np
+from sympy import *
 from tabulate import tabulate
-
-fxrf = lambda x: -0.5*x**2 + 2.5*x + 4.5
-fxs = lambda x: x**3 - 2*x - 5
 
 a = 0
 b = 0
 error = 0
 
 # Metodo de regula falsi
-
-
-def regulaFalsi(a, b, error):
+def regulaFalsi(a, b, ent, error):
+    x = Symbol("x")
+    fxrf = lambda x: eval(ent)
     tabla = []
     ep = 0
     i=0
@@ -20,23 +18,28 @@ def regulaFalsi(a, b, error):
     while (ep >= error or ep == 0):
         c = b - ((fb*(a-b))/(fa-fb))
         fc = fxrf(c)
-    
-        tabla.append([i, a, c, b, fa, fc, fb, ep])
-        cambios = np.sign(fa)*np.sign(fc)
-        if cambios > 0:
-            ep = abs((c-a)/a)*100
-            a = c
-            fa = fc
-        else:
-            ep = abs((c-b)/b)*100
-            b = c
-            fb = fc
+        try:
+            tabla.append([i, a, c, b, fa, fc, fb, ep])
+            cambios = np.sign(fa)*np.sign(fc)
+            if cambios > 0:
+                ep = abs((c-a)/a)*100
+                a = c
+                fa = fc
+            else:
+                ep = abs((c-b)/b)*100
+                b = c
+                fb = fc
+            assert a or b ==0 
+        except ZeroDivisionError:
+            break
 
-        i+=1
+        i+=1    
     return(tabla)
 
 # Método Secante
-def secante(a, b, error):
+def secante(a, b,ent, error):
+    x = Symbol("x")
+    fxs = lambda x: eval(ent)
     ep = 0
     i=0
     tabla = []
@@ -71,6 +74,7 @@ while continuar:
         else:
 
             if opt>1:
+                ent = input("Ingrese la funcion: ")
                 print("Ingrese el intervalo a evaluar:")
                 a = float(input("a: "))
                 b = float(input("b: "))
@@ -84,7 +88,7 @@ while continuar:
 
                     Grupo: 1SF131""")
             elif opt == 2:
-                tabla = regulaFalsi(a, b, error)
+                tabla = regulaFalsi(a, b, ent, error)
                 ntabla = len(tabla)
 
                 # Salida del metodo regula falsi
@@ -94,7 +98,7 @@ while continuar:
                 print('raiz:  ', "{:.4f}".format(tabla[len(tabla)-1][2]))
                 print('error: ', "{:.4f}".format(tabla[ len(tabla)-1][6]))
             elif opt == 3:
-                tabla = secante(a, b, error)
+                tabla = secante(a, b,ent, error)
                 n = len(tabla)
                 raiz = "{:.4f}".format(tabla[len(tabla)-1][5])
 
